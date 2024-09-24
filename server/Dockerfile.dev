@@ -1,0 +1,25 @@
+# Usa la imagen oficial de Node.js como imagen base
+FROM node:lts-alpine AS builder
+
+# Establece el directorio de trabajo en el contenedor
+WORKDIR /app
+
+# Copia el archivo package.json y package-lock.json al directorio de trabajo del contenedor
+COPY package*.json ./
+
+# Instala las dependencias del proyecto
+RUN npm install
+RUN npm install -g nodemon
+
+COPY prisma ./prisma
+
+RUN npx prisma generate
+
+# Copia el resto de la aplicación al directorio de docker
+COPY . .
+
+# Expone el puerto 3001
+EXPOSE 3001
+
+# Comando por defecto para ejecutar la aplicación
+CMD ["npm", "run", "dev"]
