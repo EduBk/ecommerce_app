@@ -11,15 +11,15 @@ COPY package*.json ./
 RUN npm install
 RUN npm install -g nodemon
 
-# COPY prisma ./prisma
+COPY prisma ./prisma
 
-# RUN npx prisma generate
+RUN npx prisma generate
 
 # Copia el resto de la aplicación al directorio de docker
 COPY . .
 
 # Expone el puerto 3001
-EXPOSE 3001
+EXPOSE 4000
 
 # Comando por defecto para ejecutar la aplicación
 CMD ["npm", "run", "dev"]

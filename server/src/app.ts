@@ -2,8 +2,9 @@ import "dotenv/config";
 
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { router } from "./routes";
 import morgan from "morgan";
+
+import { router } from "./routes";
 
 import { corsOptions } from "./utils/cors.handle";
 
@@ -13,6 +14,6 @@ app.use(morgan("dev"));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api", router);
+app.use("/api/v1", router);
 
 export default app;

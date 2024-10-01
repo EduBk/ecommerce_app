@@ -40,7 +40,7 @@ services:
     env_file:
       - ./server/.env
     ports:
-      - '3001:3001'
+      - '4000:4000'
     develop:
       watch:
         - action: sync
@@ -50,61 +50,36 @@ services:
             - node_modules/
         - action: rebuild
           path: package.json
+    # command: sh -c "npm run wait-for-it.sh mysql:3306 -- npm start"
     depends_on:
-      - mysql
-      # - postgres
-      # - mssql
+      mysql:
+        condition: service_healthy
 
-  # mysql:
-  #   image: 'mysql:latest'
-  #   restart: always
-  #   ports:
-  #     - '3306:3306'
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=admin
-  #     - MYSQL_DATABASE=compu_dev
-  #   volumes:
-  #     - ./db/mysql:/var/lib/mysql
-  #     - ./db/mysql:/var/opt/mysql/data
+  mysql:
+    image: 'mysql:latest'
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123
+      - MYSQL_DATABASE=uscommerce
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+      - ./db/mysql:/var/opt/mysql/data
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
-  # postgres:
-  #   image: 'postgres:latest'
-  #   restart: always
-  #   ports:
-  #     - '5432:5432'
-  #   environment:
-  #     - POSTGRES_DB=klitox
-  #     - POSTGRES_USER=enit
-  #     - POSTGRES_PASSWORD=admin123
-  #   volumes:
-  #     - ./db/postgres:/var/lib/postgresql/data
-
-  # pgadmin:
-  #   image: 'dpage/pgadmin4'
-  #   ports:
-  #     - '5050:80'
-  #   environment:
-  #     - PGADMIN_DEFAULT_EMAIL=enit@gmail.com
-  #     - PGADMIN_DEFAULT_PASSWORD=admin123
-
-  # mssql:
-  #   image: 'mcr.microsoft.com/mssql/server'
-  #   restart: always
-  #   ports:
-  #     - '1433:1433'
-  #   environment:
-  #     - MSSQL_SA_PASSWORD=admin
-  #     - ACCEPT_EULA=Y
-  #     - MSSQL_PID=Developer
-  #     - MSSQL_DATA_DIR=/var/opt/sqlserver/data
-  #     - MSSQL_LOG_DIR=/var/opt/sqlserver/log
-  #     - MSSQL_BACKUP_DIR=/var/opt/sqlserver/backup
-  #   volumes:
-  #     - ./db/mssql:/var/opt/mssql
-  #     - ./db/mssql:/var/opt/sqlserver/data
-  #     - ./db/mssql:/var/opt/sqlserver/log
-  #     - ./db/mssql:/var/opt/sqlserver/backup
-  #     - /c/docker/shared:/usr/shared
+  phpmyadmin:
+    image: 'phpmyadmin:latest'
+    restart: always
+    ports:
+      - '8181:80'
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
       
       #despues de levantar el servicio docker-compose correr
       # - docker-compose exec server npx prisma migrate dev
