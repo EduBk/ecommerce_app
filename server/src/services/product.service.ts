@@ -31,25 +31,24 @@ export class ProductsService {
     return newProduct
   }
 
-  // async update(id, changes) {
-  //   const index = this.products.findIndex((item) => item.id === id);
-  //   if (index === -1) {
-  //     throw boom.notFound('product not found');
-  //   }
-  //   const product = this.products[index];
-  //   this.products[index] = {
-  //     ...product,
-  //     ...changes,
-  //   };
-  //   return this.products[index];
-  // }
+  async update(id: number, changes: CreateProductDto) {
+    const updatedProduct = await this.prisma.product.update({
+      where: {
+        id: id
+      },
+      data: changes
+    })
 
-  // async delete(id) {
-  //   const index = this.products.findIndex((item) => item.id === id);
-  //   if (index === -1) {
-  //     throw boom.notFound('product not found');
-  //   }
-  //   this.products.splice(index, 1);
-  //   return { id };
-  // }
+    return updatedProduct
+  }
+
+  async delete(id: number) {
+    const deletedProduct = await this.prisma.product.delete({
+      where: {
+        id: id
+      }
+    })
+
+    return deletedProduct
+  }
 }

@@ -1,11 +1,10 @@
-//! Importa variables de ENTORNO
 import 'dotenv/config'
 
-//! Importa la APP definida en app.ts
 import app from './app'
 import prismaService from './services/prisma.service'
+import { config } from './config/env'
 
-const PORT = process.env.PORT || 3001
+const PORT = config.port || 3001
 
 async function startServer() {
   await prismaService.connect()
@@ -22,5 +21,5 @@ process.on('SIGINT', async () => {
   await prismaService.disconnect()
   process.exit()
 })
-//! Se inicia el servidor y queda en escucha
+
 startServer().catch(console.error)

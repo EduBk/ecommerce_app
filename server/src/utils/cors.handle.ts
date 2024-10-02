@@ -1,22 +1,23 @@
 //! IMPORTACION DE VARIABLES DE ENTORNO
-import "dotenv/config";
+import 'dotenv/config'
+import { config } from '../config/env'
 
-const base_url = process.env.BASE_URL as string;
-const whiteList = [base_url, "http://localhost:3000"];
+const baseUrl = config.url as string
+const whiteList = [baseUrl, 'http://localhost:3000', 'http://localhost:4000']
 
 const corsOptions = {
   origin: function (origin: any, callback: any) {
-    let corsPass = true;
+    let corsPass = true
     if (whiteList.indexOf(origin) !== -1) {
-      corsPass = true;
+      corsPass = true
     } else {
-      corsPass = false;
+      corsPass = false
     }
-    callback(null, corsPass);
+    callback(null, corsPass)
   },
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-};
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}
 
-export { corsOptions };
+export { corsOptions }

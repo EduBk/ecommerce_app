@@ -1,6 +1,7 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { ProductsService } from '../services/product.service'
 import { CreateProductDto } from '../dtos/types'
+import { ApiError } from '../utils/apiError.handle'
 
 export class ProductsController {
   private productsService: ProductsService
@@ -10,60 +11,82 @@ export class ProductsController {
   }
 
   // GET all products
-  async getProducts(req: Request, res: Response): Promise<void> {
+  async getProducts(req: Request, res: Response, next: NextFunction) {
     try {
       const products = await this.productsService.find()
       res.json(products)
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching products', error })
+      next(new ApiError(500, 'Error fetching products.'))
     }
   }
 
   // GET a product by ID
-  async getProduct(req: Request, res: Response): Promise<void> {
+  async getProduct(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params
     try {
       const product = await this.productsService.findOne(Number(id))
       if (!product) {
-        res.status(404).json({ message: 'Product not found' })
+        throw new ApiError(404, 'Product not found.')
+      } else {
+        res.json(product)
       }
-      res.json(product)
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching product', error })
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(500, 'Error fetching product')
+      )
     }
   }
 
-  //   // POST to create a new product
-  async createProduct(req: Request, res: Response): Promise<void> {
+  // POST to create a new product
+  async createProduct(req: Request, res: Response, next: NextFunction) {
     const data: CreateProductDto = req.body
     try {
       const newProduct = await this.productsService.create(data)
       res.json(newProduct)
     } catch (error) {
-      res.status(500).json({ message: 'Error creating product', error })
+      next(new ApiError(500, 'Error creating product'))
     }
   }
 
-  //   // PATCH to update a product by ID
-  //   async updateTask(req: Request, res: Response): Promise<void> {
-  //     const { id } = req.params
-  //     const changes = req.body
-  //     try {
-  //       const updatedProduct = await this.productsService.update(id, changes)
-  //       res.json(updatedProduct)
-  //     } catch (error) {
-  //       res.status(500).json({ message: 'Error updating product', error })
-  //     }
-  //   }
+  // PATCH to update a product by ID
+  async updateProduct(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params
+    const changes = req.body
+    try {
+      const updatedProduct = await this.productsService.update(
+        Number(id),
+        changes
+      )
+      if (!updatedProduct) {
+        throw new ApiError(404, 'Product not found')
+      }
+      res.json(updatedProduct)
+    } catch (error) {
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(500, 'Error updating product')
+      )
+    }
+  }
 
-  //   // DELETE a product by ID
-  //   async deleteTask(req: Request, res: Response): Promise<void> {
-  //     const { id } = req.params
-  //     try {
-  //       const deletedProduct = await this.productsService.delete(id)
-  //       res.json(deletedProduct)
-  //     } catch (error) {
-  //       res.status(500).json({ message: 'Error deleting product', error })
-  //     }
-  //   }
+  // DELETE a product by ID
+  async deleteProduct(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params
+    try {
+      const deletedProduct = await this.productsService.delete(Number(id))
+      if (!deletedProduct) {
+        throw new ApiError(404, 'Product not found')
+      }
+      res.json(deletedProduct)
+    } catch (error) {
+      next(
+        error instanceof ApiError
+          ? error
+          : new ApiError(500, 'Error deleting product')
+      )
+    }
+  }
 }
