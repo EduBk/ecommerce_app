@@ -13,12 +13,183 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      Role      @default(CUSTOMER)
+  orders    Order[]
+  reviews   Review[]
+  addresses Address[]
+  cart      Cart?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  lastLogin DateTime? @map("last_login")
+
+  @@index([email])
+  @@map("users")
+}
+
 model Product {
-  id          Int      @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
+  sku            String       @unique
+  name           String
+  description    String       @db.Text
+  price          Decimal      @db.Decimal(10, 2)
+  compareAtPrice Decimal?     @map("compare_at_price") @db.Decimal(10, 2)
+  imageUrl       String       @map("image_url")
+  stock          Int          @default(0)
+  category       Category     @relation(fields: [categoryId], references: [id])
+  categoryId     Int          @map("category_id")
+  orderItems     OrderItem[]
+  cartItems      CartItem[]
+  reviews        Review[]
+  tags           ProductTag[]
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@index([name])
+  @@index([categoryId])
+  @@map("products")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  slug        String     @unique
+  description String?    @db.Text
+  parentId    Int?       @map("parent_id")
+  parent      Category?  @relation("SubCategories", fields: [parentId], references: [id])
+  children    Category[] @relation("SubCategories")
+  products    Product[]
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Order {
+  id                Int           @id @default(autoincrement())
+  user              User          @relation(fields: [userId], references: [id])
+  userId            Int           @map("user_id")
+  status            OrderStatus   @default(PENDING)
+  totalAmount       Decimal       @map("total_amount") @db.Decimal(10, 2)
+  items             OrderItem[]
+  shippingAddress   Address       @relation(fields: [shippingAddressId], references: [id])
+  shippingAddressId Int           @map("shipping_address_id")
+  paymentMethod     PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId   Int           @map("payment_method_id")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   Int     @map("order_id")
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int     @map("product_id")
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String   @db.Text
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @map("user_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int      @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([productId])
+  @@map("reviews")
+}
+
+model Address {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @map("user_id")
+  street    String
+  city      String
+  state     String
+  country   String
+  zipCode   String  @map("zip_code")
+  isDefault Boolean @default(false) @map("is_default")
+  orders    Order[]
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model PaymentMethod {
+  id          Int     @id @default(autoincrement())
   name        String
-  description String? @db.VarChar(1000)
-  price       Float
-  image       String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  description String?
+  prueba      String?
+  orders      Order[]
+
+  @@map("payment_methods")
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int        @unique @map("user_id")
+  items     CartItem[]
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  cartId    Int     @map("cart_id")
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int     @map("product_id")
+  quantity  Int
+
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_items")
+}
+
+model ProductTag {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("product_tags")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+  MANAGER
+  SELLER
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
