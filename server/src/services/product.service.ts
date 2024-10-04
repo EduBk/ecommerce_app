@@ -1,5 +1,3 @@
-// const { faker } = require('@faker-js/faker');
-// const boom = require('@hapi/boom');
 import { Product } from '@prisma/client'
 import { PrismaClient } from '@prisma/client'
 import prismaService from '../services/prisma.service'

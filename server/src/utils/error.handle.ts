@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { ApiError } from './apiError.handle'
 import { config } from '../config/env'
+import { ZodError } from 'zod'
+import { ValidationError } from './validationError.handle'
 
 export const errorConverter = (
   err: any,
@@ -9,7 +11,9 @@ export const errorConverter = (
   next: NextFunction
 ) => {
   let error = err
-  if (!(error instanceof ApiError)) {
+  if (error instanceof ZodError) {
+    error = new ValidationError(error)
+  } else if (!(error instanceof ApiError)) {
     const statusCode = error.statusCode || 500
     const message = error.message || 'Internal Server Error'
     error = new ApiError(statusCode, message, false, err.stack)
@@ -18,7 +22,7 @@ export const errorConverter = (
 }
 
 export const errorHandler = (
-  err: ApiError,
+  err: ApiError | ValidationError,
   req: Request,
   res: Response,
   next: NextFunction
@@ -31,9 +35,10 @@ export const errorHandler = (
 
   res.locals.errorMessage = err.message
 
-  const response = {
+  const response: any = {
     code: statusCode,
     message,
+    ...(err instanceof ValidationError && { errors: err.errors }),
     ...(!config.isProd && { stack: err.stack })
   }
 
