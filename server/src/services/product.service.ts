@@ -1,7 +1,7 @@
-import { Product } from '@prisma/client'
-import { PrismaClient } from '@prisma/client'
+import { Product, PrismaClient } from '@prisma/client'
 import prismaService from '../services/prisma.service'
-import { CreateProductDto } from '../dtos/types'
+import { ProductInput, productSchema } from '../schemas/product.schema'
+import { ApiError } from '../utils/apiError.handle'
 
 export class ProductsService {
   private prisma: PrismaClient
@@ -10,15 +10,20 @@ export class ProductsService {
   }
 
   async find(): Promise<Product[]> {
-    return this.prisma.product.findMany({
+    const products = await this.prisma.product.findMany({
       include: {
         category: true
       }
     })
+    if (!products) {
+      throw new ApiError(500, 'Error fetching products')
+    }
+
+    return products
   }
 
   async findOne(id: number): Promise<Product | null> {
-    return this.prisma.product.findUnique({
+    const existingProduct = await this.prisma.product.findUnique({
       where: {
         id
       },
@@ -26,31 +31,41 @@ export class ProductsService {
         category: true
       }
     })
+
+    if (!existingProduct) {
+      throw new ApiError(404, 'Product not found')
+    }
+
+    return existingProduct
   }
 
-  async create(data: CreateProductDto) {
+  async create(data: ProductInput) {
+    const validatedData = productSchema.parse(data)
     const newProduct = await this.prisma.product.create({
-      data
+      data: validatedData
     })
 
     return newProduct
   }
 
-  async update(id: number, changes: CreateProductDto) {
+  async update(id: number, changes: ProductInput) {
+    const validatedData = productSchema.parse(changes)
+    await this.findOne(id)
     const updatedProduct = await this.prisma.product.update({
       where: {
         id: id
       },
-      data: changes
+      data: validatedData
     })
 
     return updatedProduct
   }
 
   async delete(id: number) {
+    await this.findOne(id)
     const deletedProduct = await this.prisma.product.delete({
       where: {
-        id: id
+        id
       }
     })
 

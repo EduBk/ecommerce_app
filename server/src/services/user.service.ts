@@ -1,5 +1,4 @@
-import { User } from '@prisma/client'
-import { PrismaClient } from '@prisma/client'
+import { User, PrismaClient } from '@prisma/client'
 import prismaService from '../services/prisma.service'
 import { UserInput, userSchema } from '../schemas/user.schema'
 import { ApiError } from '../utils/apiError.handle'
@@ -11,15 +10,20 @@ export class UserService {
   }
 
   async find(): Promise<User[]> {
-    return this.prisma.user.findMany({
+    const user = await this.prisma.user.findMany({
       include: {
         addresses: true
       }
     })
+    if (!user) {
+      throw new ApiError(500, 'Error fetching users')
+    }
+
+    return user
   }
 
   async findOne(id: number): Promise<User | null> {
-    return this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: {
         id
       },
@@ -27,18 +31,16 @@ export class UserService {
         addresses: true
       }
     })
+
+    if (!existingUser) {
+      throw new ApiError(404, 'User not found')
+    }
+
+    return existingUser
   }
 
   async create(data: UserInput) {
     const validatedData = userSchema.parse(data)
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: validatedData.email }
-    })
-
-    if (existingUser) {
-      throw new ApiError(400, 'Email already in use')
-    }
-
     const newUser = await this.prisma.user.create({
       data: validatedData
     })
@@ -48,23 +50,25 @@ export class UserService {
 
   async update(id: number, changes: UserInput) {
     const validatedData = userSchema.parse(changes)
-    const updateUser = await this.prisma.user.update({
+    await this.findOne(id)
+    const updatedUser = await this.prisma.user.update({
       where: {
-        id: id
+        id
       },
       data: validatedData
     })
 
-    return updateUser
+    return updatedUser
   }
 
   async delete(id: number) {
-    const deleteUser = await this.prisma.user.delete({
+    await this.findOne(id)
+    const deletedUser = await this.prisma.user.delete({
       where: {
         id: id
       }
     })
 
-    return deleteUser
+    return deletedUser
   }
 }

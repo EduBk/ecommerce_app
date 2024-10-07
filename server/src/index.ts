@@ -4,7 +4,7 @@ import app from './app'
 import prismaService from './services/prisma.service'
 import { config } from './config/env'
 
-const PORT = config.port || 3001
+const { PORT } = config
 
 async function startServer() {
   await prismaService.connect()

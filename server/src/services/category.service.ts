@@ -1,9 +1,7 @@
-// const { faker } = require('@faker-js/faker');
-// const boom = require('@hapi/boom');
-import { Category } from '@prisma/client'
-import { PrismaClient } from '@prisma/client'
+import { Category, PrismaClient } from '@prisma/client'
 import prismaService from '../services/prisma.service'
-import { CreateCategoryDto } from '../dtos/types'
+import { CategoryInput, categorySchema } from '../schemas/category.schema'
+import { ApiError } from '../utils/apiError.handle'
 
 export class CategoryService {
   private prisma: PrismaClient
@@ -12,51 +10,58 @@ export class CategoryService {
   }
 
   async find(): Promise<Category[]> {
-    return this.prisma.category.findMany()
+    const categories = await this.prisma.category.findMany()
+    if (!categories) {
+      throw new ApiError(500, 'Error fetching categories')
+    }
+
+    return categories
   }
 
   async findOne(id: number): Promise<Category | null> {
-    return this.prisma.category.findUnique({
+    const existingCategory = await this.prisma.category.findUnique({
       where: {
         id
       }
     })
+
+    if (!existingCategory) {
+      throw new ApiError(404, 'Category not found')
+    }
+
+    return existingCategory
   }
 
-  async create(data: CreateCategoryDto) {
-    const dataWithSlug = this.getSlug(data)
+  async create(data: CategoryInput) {
+    const validatedData = categorySchema.parse(data)
     const newCategory = await this.prisma.category.create({
-      data: dataWithSlug
+      data: validatedData
     })
 
     return newCategory
   }
 
-  async update(id: number, changes: CreateCategoryDto) {
+  async update(id: number, changes: CategoryInput) {
+    const validatedData = categorySchema.parse(changes)
+    await this.findOne(id)
     const updatedCategory = await this.prisma.category.update({
       where: {
         id: id
       },
-      data: changes
+      data: validatedData
     })
 
     return updatedCategory
   }
 
   async delete(id: number) {
+    await this.findOne(id)
     const deletedCategory = await this.prisma.category.delete({
       where: {
-        id: id
+        id
       }
     })
 
     return deletedCategory
-  }
-
-  getSlug = (data: CreateCategoryDto) => {
-    const slug = data.name.toLowerCase().replace(/\s+/g, '-')
-    const dataWithSlug = { ...data, slug }
-    // console.log(dataWithSlug)
-    return dataWithSlug
   }
 }

@@ -4,6 +4,8 @@ import { config } from '../config/env'
 import { ZodError } from 'zod'
 import { ValidationError } from './validationError.handle'
 
+const { IS_PROD } = config
+
 export const errorConverter = (
   err: any,
   req: Request,
@@ -28,7 +30,7 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   let { statusCode, message } = err
-  if (config.isProd && !err.isOperational) {
+  if (IS_PROD && !err.isOperational) {
     statusCode = 500
     message = 'Internal Server Error'
   }
@@ -39,10 +41,10 @@ export const errorHandler = (
     code: statusCode,
     message,
     ...(err instanceof ValidationError && { errors: err.errors }),
-    ...(!config.isProd && { stack: err.stack })
+    ...(!IS_PROD && { stack: err.stack })
   }
 
-  if (config.isProd) {
+  if (IS_PROD) {
     console.error(err)
   }
 

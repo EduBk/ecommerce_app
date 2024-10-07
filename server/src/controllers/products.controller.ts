@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import { ProductsService } from '../services/product.service'
-import { CreateProductDto } from '../dtos/types'
-import { ApiError } from '../utils/apiError.handle'
 
 export class ProductsController {
   private productsService: ProductsService
@@ -16,7 +14,7 @@ export class ProductsController {
       const products = await this.productsService.find()
       res.json(products)
     } catch (error) {
-      next(new ApiError(500, 'Error fetching products.'))
+      next(error)
     }
   }
 
@@ -25,28 +23,20 @@ export class ProductsController {
     const { id } = req.params
     try {
       const product = await this.productsService.findOne(Number(id))
-      if (!product) {
-        throw new ApiError(404, 'Product not found.')
-      } else {
-        res.json(product)
-      }
+      res.json(product)
     } catch (error) {
-      next(
-        error instanceof ApiError
-          ? error
-          : new ApiError(500, 'Error fetching product')
-      )
+      next(error)
     }
   }
 
   // POST to create a new product
   async createProduct(req: Request, res: Response, next: NextFunction) {
-    const data: CreateProductDto = req.body
+    const { body } = req
     try {
-      const newProduct = await this.productsService.create(data)
+      const newProduct = await this.productsService.create(body)
       res.json(newProduct)
     } catch (error) {
-      next(new ApiError(500, 'Error creating product'))
+      next(error)
     }
   }
 
@@ -59,16 +49,9 @@ export class ProductsController {
         Number(id),
         changes
       )
-      if (!updatedProduct) {
-        throw new ApiError(404, 'Product not found')
-      }
       res.json(updatedProduct)
     } catch (error) {
-      next(
-        error instanceof ApiError
-          ? error
-          : new ApiError(500, 'Error updating product')
-      )
+      next(error)
     }
   }
 
@@ -77,16 +60,9 @@ export class ProductsController {
     const { id } = req.params
     try {
       const deletedProduct = await this.productsService.delete(Number(id))
-      if (!deletedProduct) {
-        throw new ApiError(404, 'Product not found')
-      }
       res.json(deletedProduct)
     } catch (error) {
-      next(
-        error instanceof ApiError
-          ? error
-          : new ApiError(500, 'Error deleting product')
-      )
+      next(error)
     }
   }
 }

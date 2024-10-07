@@ -15,20 +15,36 @@ datasource db {
 
 model User {
   id        Int       @id @default(autoincrement())
+  googleId  String?   @unique @map("google_id")
   email     String    @unique
   password  String
   name      String
   role      Role      @default(CUSTOMER)
+  lastLogin DateTime? @map("last_login")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  cart      Cart?
   orders    Order[]
   reviews   Review[]
   addresses Address[]
-  cart      Cart?
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  lastLogin DateTime? @map("last_login")
+  Session   Session[]
 
   @@index([email])
+  @@index([googleId])
   @@map("users")
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique @map("user_id")
+  user         User     @relation(fields: [userId], references: [id])
+  accessToken  String?  @map("access_token")
+  refreshToken String?  @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("sessions")
 }
 
 model Product {

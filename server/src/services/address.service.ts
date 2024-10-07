@@ -1,5 +1,4 @@
-import { Address } from '@prisma/client'
-import { PrismaClient } from '@prisma/client'
+import { Address, PrismaClient } from '@prisma/client'
 import prismaService from '../services/prisma.service'
 import { AddressInput, addressSchema } from '../schemas/address.schema'
 import { ApiError } from '../utils/apiError.handle'

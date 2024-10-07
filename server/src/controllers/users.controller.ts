@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import { UserService } from '../services/user.service'
-import { ApiError } from '../utils/apiError.handle'
 
 export class UsersController {
   private userService: UserService
@@ -15,7 +14,7 @@ export class UsersController {
       const users = await this.userService.find()
       res.json(users)
     } catch (error) {
-      next(new ApiError(500, 'Error fetching users.'))
+      next(error)
     }
   }
 
@@ -24,17 +23,9 @@ export class UsersController {
     const { id } = req.params
     try {
       const user = await this.userService.findOne(Number(id))
-      if (!user) {
-        throw new ApiError(404, 'User not found.')
-      } else {
-        res.json(user)
-      }
+      res.json(user)
     } catch (error) {
-      next(
-        error instanceof ApiError
-          ? error
-          : new ApiError(500, 'Error fetching user')
-      )
+      next(error)
     }
   }
 
@@ -45,7 +36,7 @@ export class UsersController {
       const newUser = await this.userService.create(body)
       res.json(newUser)
     } catch (error) {
-      next(error);
+      next(error)
     }
   }
 
@@ -55,16 +46,9 @@ export class UsersController {
     const changes = req.body
     try {
       const updatedUser = await this.userService.update(Number(id), changes)
-      if (!updatedUser) {
-        throw new ApiError(404, 'User not found')
-      }
       res.json(updatedUser)
     } catch (error) {
-      next(
-        error instanceof ApiError
-          ? error
-          : new ApiError(500, 'Error updating user')
-      )
+      next(error)
     }
   }
 
@@ -73,16 +57,9 @@ export class UsersController {
     const { id } = req.params
     try {
       const deletedUser = await this.userService.delete(Number(id))
-      if (!deletedUser) {
-        throw new ApiError(404, 'User not found')
-      }
       res.json(deletedUser)
     } catch (error) {
-      next(
-        error instanceof ApiError
-          ? error
-          : new ApiError(500, 'Error deleting user')
-      )
+      next(error)
     }
   }
 }

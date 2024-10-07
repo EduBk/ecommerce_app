@@ -2,8 +2,8 @@
 import 'dotenv/config'
 import { config } from '../config/env'
 
-const baseUrl = config.url as string
-const whiteList = [baseUrl, 'http://localhost:3000', 'http://localhost:4000']
+const { LOCAL_URL } = config
+const whiteList = [LOCAL_URL, 'http://localhost:3000', 'http://localhost:4000']
 
 const corsOptions = {
   origin: function (origin: any, callback: any) {
