@@ -1,23 +1,31 @@
-//! IMPORTACION DE VARIABLES DE ENTORNO
 import 'dotenv/config'
+import { CorsOptions } from 'cors'
+
 import { config } from '../config/env'
+import { ApiError } from './apiError.handle'
 
 const { LOCAL_URL } = config
 const whiteList = [LOCAL_URL, 'http://localhost:3000', 'http://localhost:4000']
 
-const corsOptions = {
-  origin: function (origin: any, callback: any) {
-    let corsPass = true
-    if (whiteList.indexOf(origin) !== -1) {
-      corsPass = true
+const corsOptions: CorsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || whiteList.indexOf(origin) !== -1) {
+      callback(null, true)
     } else {
-      corsPass = false
+      callback(new ApiError(403, 'Not allowed by cors'))
     }
-    callback(null, corsPass)
   },
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  credentials: true,
+  maxAge: 86400, // 24 hours
+  exposedHeaders: ['set-cookie']
 }
 
 export { corsOptions }

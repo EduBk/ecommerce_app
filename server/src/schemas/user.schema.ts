@@ -7,7 +7,8 @@ const userSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   name: z.string().min(1, 'Name is required').max(100, 'Name is too long'),
   role: RoleEnum.optional().default('CUSTOMER'),
-  lastLogin: z.date().optional().nullable()
+  lastLogin: z.date().optional().nullable(),
+  googleId: z.string().optional().nullable()
 })
 
 type UserInput = z.infer<typeof userSchema>
