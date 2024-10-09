@@ -34,7 +34,7 @@ export class AuthController {
         if (!user) return res.redirect('/login')
         req.login(user, (error) => {
           if (error) return next(error)
-          res.redirect('/api/v1/auth/profile')
+          res.redirect('/')
         })
       }
     )(req, res, next)
