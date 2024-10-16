@@ -1,0 +1,124 @@
+.form-container {
+    width: 350px;
+    background-color: var(--background);
+    padding: 32px 24px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--foreground);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    border: 1px solid var(--foreground);
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+  }
+  
+  .form-container button:active {
+    scale: 0.95;
+  }
+  
+  .form-container .logo-container {
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  
+  .form-container .social-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .form-container .social-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-family: inherit;
+    border: none;
+    padding: 12px 16px;
+    gap: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.084), 3px 3px 3px rgba(0, 0, 0, 0.168);
+  }
+  
+  .form-container .social-button svg {
+    width: 22px;
+    height: 22px;
+    fill: white;
+  }
+  
+  .form-container .social-button.facebook {
+    background-color: #1778f2;
+    color: #fff;
+  }
+  
+  .form-container .social-button.google {
+    background-color: #ffff;
+    color: #000;
+  }
+  
+  .form-container .form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .form-container .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .form-container .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-container .form-group input[type="text"],
+  .form-container .form-group input[type="password"] {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    border: 1px solid #ccc;
+  }
+  
+  .form-container .form-group input::placeholder {
+    opacity: 0.5;
+  }
+  
+  .form-container .form-group input[type="text"]:focus,
+  .form-container .form-group input[type="password"]:focus {
+    outline: none;
+    border-color: #1778f2;
+  }
+  
+  .form-container .form-submit-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: inherit;
+    color: #fff;
+    background-color: #002447;
+    border: none;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: inherit;
+    gap: 8px;
+    margin: 12px 0;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+  }
+  
+  .form-container .form-submit-btn:hover {
+    background-color: #04386b;
+  }
+  

@@ -1,0 +1,11 @@
+.login-container {
+    background-image: url("https://e7.pngegg.com/pngimages/303/576/png-clipart-green-flowing-green-wave-material-green-and-white-logo-angle-happy-birthday-vector-images.png");
+    background-size: cover; /* Hace que la imagen ocupe toda la pantalla */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat;
+    width: 100vw; /* Hace que el fondo ocupe el ancho completo */
+    height: 100vh; /* Hace que el fondo ocupe la altura completa */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

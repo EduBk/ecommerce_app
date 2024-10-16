@@ -1,0 +1,30 @@
+.container {
+  width: 400px;
+  height: 500px;
+  background-color: lightgreen;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-weight: bold;
+  font-size: larger;
+}
+.azul-rey {
+  height: 20%;
+  background-color: #002447;
+}
+.azul-cielo {
+  height: 20%;
+  background-color: #79c5e7;
+}
+.blanco {
+  height: 20%;
+  background-color: #fffaf7;
+}
+.piel {
+  height: 20%;
+  background-color: #f2dcc5;
+}
+.anaranjado {
+  height: 20%;
+  background-color: #bc672c;
+}

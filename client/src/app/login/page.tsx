@@ -1,11 +1,13 @@
-import './Login.module.css'
+import Login from 'app/components/Login'
 
-const Login = () => {
+import './LoginPage.css'
+
+const LoginPage = () => {
   return (
-    <div className='button-login'>
-      <a href='/api/v1/auth/google'>Inicia sesion con Google</a>
+    <div className='login-container'>
+      <Login />
     </div>
   )
 }
 
-export default Login
+export default LoginPage

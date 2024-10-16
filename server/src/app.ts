@@ -10,12 +10,15 @@ import { corsOptions } from './utils/cors.handle'
 import { errorConverter, errorHandler } from './utils/error.handle'
 import { ApiError } from './utils/apiError.handle'
 import { config } from './config/env'
+import { validateEnv } from './utils/validationEnv.handle'
 
 const app = express()
 const { SECRET_KEY, IS_PROD } = config
 
+validateEnv()
+
 if (!SECRET_KEY) {
-  throw new Error('SECRET_KEY must be set in environment variables')
+  throw new ApiError(500, 'SECRET_KEY must be set in environment variables')
 }
 
 app.use(morgan('dev'))
